@@ -1,0 +1,7 @@
+action_id,batch_id,replacement_cost,days_offline,new_generation
+A1,B1,1600,2,replacement
+A2,B2,1700,2,replacement
+A3,B3,1800,2,replacement
+A4,B4,1900,2,replacement
+A5,B5,2000,2,replacement
+A6,B6,2100,2,replacement

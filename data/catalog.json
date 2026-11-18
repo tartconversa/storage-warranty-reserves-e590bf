@@ -1,0 +1,492 @@
+{
+  "title": "储能质保的迟报风险与资金准备分析",
+  "synthetic": true,
+  "tables": [
+    {
+      "name": "units",
+      "description": "在保设备与合同。",
+      "columns": [
+        {
+          "name": "unit_id",
+          "type": "string",
+          "description": "设备",
+          "nullable": true
+        },
+        {
+          "name": "batch_id",
+          "type": "string",
+          "description": "制造批",
+          "nullable": true
+        },
+        {
+          "name": "station_id",
+          "type": "string",
+          "description": "站",
+          "nullable": true
+        },
+        {
+          "name": "contract_id",
+          "type": "string",
+          "description": "合同",
+          "nullable": true
+        },
+        {
+          "name": "commissioned",
+          "type": "date",
+          "description": "投运",
+          "nullable": true
+        },
+        {
+          "name": "warranty_end",
+          "type": "date",
+          "description": "保障结束",
+          "nullable": true
+        }
+      ],
+      "key": [
+        "unit_id"
+      ],
+      "references": [],
+      "path": "data/units.csv",
+      "row_count": 180,
+      "sha256": "400e4669843cdcbad856a2adaa41a9439da14425d9d5b5150caf2f32600cb300"
+    },
+    {
+      "name": "coverage",
+      "description": "内部明确赔付口径，并非会计准则。",
+      "columns": [
+        {
+          "name": "contract_id",
+          "type": "string",
+          "description": "合同",
+          "nullable": true
+        },
+        {
+          "name": "component",
+          "type": "string",
+          "description": "承保部件",
+          "nullable": true
+        },
+        {
+          "name": "cap",
+          "type": "number",
+          "description": "每故障赔付上限",
+          "nullable": true
+        },
+        {
+          "name": "deductible",
+          "type": "number",
+          "description": "每故障客户自付",
+          "nullable": true
+        }
+      ],
+      "key": [
+        "contract_id",
+        "component"
+      ],
+      "references": [],
+      "path": "data/coverage.csv",
+      "row_count": 2,
+      "sha256": "40768a156525fa37dd4ddff66b4225d38715ab82a86cad6e7a388eac83af4ef6"
+    },
+    {
+      "name": "spells",
+      "description": "原件与更换件暴露。",
+      "columns": [
+        {
+          "name": "spell_id",
+          "type": "string",
+          "description": "经历",
+          "nullable": true
+        },
+        {
+          "name": "unit_id",
+          "type": "string",
+          "description": "设备",
+          "nullable": true
+        },
+        {
+          "name": "component_generation",
+          "type": "string",
+          "description": "部件代际",
+          "nullable": true
+        },
+        {
+          "name": "start",
+          "type": "date",
+          "description": "开始",
+          "nullable": true
+        },
+        {
+          "name": "end",
+          "type": "date",
+          "description": "结束",
+          "nullable": true
+        },
+        {
+          "name": "end_reason",
+          "type": "string",
+          "description": "终止原因",
+          "nullable": true
+        },
+        {
+          "name": "available_at",
+          "type": "datetime",
+          "description": "可知时点",
+          "nullable": true
+        }
+      ],
+      "key": [
+        "spell_id"
+      ],
+      "references": [
+        {
+          "column": "unit_id",
+          "target_table": "units",
+          "target_column": "unit_id"
+        }
+      ],
+      "path": "data/spells.csv",
+      "row_count": 189,
+      "sha256": "1052eb3a84657d6ea43a907c5130e08b18c2a6e16e8fef4c34069c4a5fbb2197"
+    },
+    {
+      "name": "monthly_exposure",
+      "description": "逐月当时可知的保障暴露，不用期末全量经历倒填历史。",
+      "columns": [
+        {
+          "name": "unit_id",
+          "type": "string",
+          "description": "设备",
+          "nullable": true
+        },
+        {
+          "name": "month_start",
+          "type": "date",
+          "description": "月起日",
+          "nullable": true
+        },
+        {
+          "name": "component_generation",
+          "type": "string",
+          "description": "代际",
+          "nullable": true
+        },
+        {
+          "name": "covered_days",
+          "type": "integer",
+          "description": "承保天数",
+          "nullable": true
+        },
+        {
+          "name": "available_at",
+          "type": "datetime",
+          "description": "可知",
+          "nullable": true
+        }
+      ],
+      "key": [
+        "unit_id",
+        "month_start"
+      ],
+      "references": [
+        {
+          "column": "unit_id",
+          "target_table": "units",
+          "target_column": "unit_id"
+        }
+      ],
+      "path": "data/monthly_exposure.csv",
+      "row_count": 3600,
+      "sha256": "2ae7cd058fe7389f4ccb8d687336d769c6e2873a01627aa4b69d7b62be71a49d"
+    },
+    {
+      "name": "cases",
+      "description": "报案版本，实体故障可有重复报案。",
+      "columns": [
+        {
+          "name": "report_id",
+          "type": "string",
+          "description": "报案",
+          "nullable": true
+        },
+        {
+          "name": "revision",
+          "type": "integer",
+          "description": "修订",
+          "nullable": true
+        },
+        {
+          "name": "incident_id",
+          "type": "string",
+          "description": "实体故障",
+          "nullable": true
+        },
+        {
+          "name": "unit_id",
+          "type": "string",
+          "description": "设备",
+          "nullable": true
+        },
+        {
+          "name": "failed_at",
+          "type": "datetime",
+          "description": "故障日",
+          "nullable": true
+        },
+        {
+          "name": "reported_at",
+          "type": "datetime",
+          "description": "报案日",
+          "nullable": true
+        },
+        {
+          "name": "component",
+          "type": "string",
+          "description": "部件",
+          "nullable": true
+        },
+        {
+          "name": "status",
+          "type": "string",
+          "description": "核定状态",
+          "nullable": true
+        },
+        {
+          "name": "gross_cost",
+          "type": "number",
+          "description": "费用预估",
+          "nullable": true
+        },
+        {
+          "name": "cash_due",
+          "type": "datetime",
+          "description": "预计支付日",
+          "nullable": true
+        },
+        {
+          "name": "available_at",
+          "type": "datetime",
+          "description": "版本可知",
+          "nullable": true
+        }
+      ],
+      "key": [
+        "report_id",
+        "revision"
+      ],
+      "references": [
+        {
+          "column": "unit_id",
+          "target_table": "units",
+          "target_column": "unit_id"
+        }
+      ],
+      "path": "data/cases.csv",
+      "row_count": 99,
+      "sha256": "ad31dd3e2c7c17bf844e93c2a037a0bf83b4d9a17ccd3477e0638a28350e1170"
+    },
+    {
+      "name": "payments",
+      "description": "独立实际现金。",
+      "columns": [
+        {
+          "name": "payment_id",
+          "type": "string",
+          "description": "现金",
+          "nullable": true
+        },
+        {
+          "name": "incident_id",
+          "type": "string",
+          "description": "故障",
+          "nullable": true
+        },
+        {
+          "name": "amount",
+          "type": "number",
+          "description": "现金金额",
+          "nullable": true
+        },
+        {
+          "name": "occurred_at",
+          "type": "datetime",
+          "description": "发生",
+          "nullable": true
+        },
+        {
+          "name": "kind",
+          "type": "string",
+          "description": "payment或recovery",
+          "nullable": true
+        }
+      ],
+      "key": [
+        "payment_id"
+      ],
+      "references": [],
+      "path": "data/payments.csv",
+      "row_count": 20,
+      "sha256": "385570d67954bd5ee1f58de3b3715c384fc5f9ee85861d93ffbb952ff5729e11"
+    },
+    {
+      "name": "investigations",
+      "description": "实质调查结果。",
+      "columns": [
+        {
+          "name": "investigation_id",
+          "type": "string",
+          "description": "调查",
+          "nullable": true
+        },
+        {
+          "name": "unit_id",
+          "type": "string",
+          "description": "设备",
+          "nullable": true
+        },
+        {
+          "name": "incident_id",
+          "type": "string",
+          "description": "故障可空",
+          "nullable": true
+        },
+        {
+          "name": "selection",
+          "type": "string",
+          "description": "random或targeted",
+          "nullable": true
+        },
+        {
+          "name": "probability",
+          "type": "number",
+          "description": "随机概率",
+          "nullable": true
+        },
+        {
+          "name": "finding",
+          "type": "string",
+          "description": "核实发现",
+          "nullable": true
+        },
+        {
+          "name": "cost",
+          "type": "number",
+          "description": "费用",
+          "nullable": true
+        },
+        {
+          "name": "available_at",
+          "type": "datetime",
+          "description": "可知时点",
+          "nullable": true
+        }
+      ],
+      "key": [
+        "investigation_id"
+      ],
+      "references": [
+        {
+          "column": "unit_id",
+          "target_table": "units",
+          "target_column": "unit_id"
+        }
+      ],
+      "path": "data/investigations.csv",
+      "row_count": 38,
+      "sha256": "2d88ed4d2092d761dba7d11e3fa353642d78c965ede56d7083f089199a73cb35"
+    },
+    {
+      "name": "actions",
+      "description": "预防措施成本和使用范围，效果需分析。",
+      "columns": [
+        {
+          "name": "action_id",
+          "type": "string",
+          "description": "措施",
+          "nullable": true
+        },
+        {
+          "name": "batch_id",
+          "type": "string",
+          "description": "批次",
+          "nullable": true
+        },
+        {
+          "name": "replacement_cost",
+          "type": "number",
+          "description": "单台更换费",
+          "nullable": true
+        },
+        {
+          "name": "days_offline",
+          "type": "number",
+          "description": "停运天数",
+          "nullable": true
+        },
+        {
+          "name": "new_generation",
+          "type": "string",
+          "description": "代际",
+          "nullable": true
+        }
+      ],
+      "key": [
+        "action_id"
+      ],
+      "references": [],
+      "path": "data/actions.csv",
+      "row_count": 6,
+      "sha256": "53e2671e5df0fa66ee4ec80c82e89bd815c75b6d006c0515a4e2618b3c694e93"
+    },
+    {
+      "name": "funding",
+      "description": "未来季度可用现金与内部缺口容忍。",
+      "columns": [
+        {
+          "name": "quarter",
+          "type": "string",
+          "description": "季度",
+          "nullable": true
+        },
+        {
+          "name": "start",
+          "type": "date",
+          "description": "起日",
+          "nullable": true
+        },
+        {
+          "name": "end",
+          "type": "date",
+          "description": "止日",
+          "nullable": true
+        },
+        {
+          "name": "available_cash",
+          "type": "number",
+          "description": "可用现金",
+          "nullable": true
+        },
+        {
+          "name": "shortfall_probability_limit",
+          "type": "number",
+          "description": "缺口概率上限",
+          "nullable": true
+        },
+        {
+          "name": "investigation_budget",
+          "type": "number",
+          "description": "调查预算",
+          "nullable": true
+        }
+      ],
+      "key": [
+        "quarter"
+      ],
+      "references": [],
+      "path": "data/funding.csv",
+      "row_count": 4,
+      "sha256": "60af07b20c72218517ac48d9523f25f6ff6bea02e2867f2497229a8f1780dae1"
+    }
+  ]
+}
